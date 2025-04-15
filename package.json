@@ -1,41 +1,18 @@
 {
   "name": "igc-xc-score",
   "version": "1.8.0",
-  "description": "igc-xc-score is a paragliding and hang-gliding XC scoring program in vanilla JS",
+  "description": "React Native compatible paragliding and hang-gliding XC scoring library in vanilla JS, with no web dependencies",
   "main": "dist/index.cjs",
   "module": "index.js",
   "type": "module",
   "types": "index.d.ts",
   "directories": {
-    "lib": "src",
-    "test": "test",
-    "example": "www"
-  },
-  "bin": {
-    "igc-xc-score": "dist/igc-xc-score.cjs"
+    "lib": "src"
   },
   "scripts": {
-    "test": "npm run test:es && npm run test:cjs && npm run lint",
-    "test:es": "node --max-old-space-size=2048 test/test",
-    "test:cjs": "node test/test.cjs",
     "lint": "npx eslint src",
     "doc": "npx jsdoc -d doc src/solver.js scoring-rules.config.js",
-    "nexe:linux": "npx nexe -i dist/igc-xc-score.cjs -o dist/igc-xc-score-linux -t linux-x64-12.16.2",
-    "nexe:win": "npx nexe -i dist/igc-xc-score.cjs -o dist/igc-xc-score.exe -t windows-x64-12.16.3",
-    "nexe:mac": "npx nexe -i dist/igc-xc-score.cjs -o dist/igc-xc-score-macos -t mac-x64-12.16.3",
-    "nexe": "npm run nexe:linux && npm run nexe:win && npm run nexe:mac",
-    "www": "npx webpack --mode=production",
-    "watch": "npx webpack --mode=development --watch",
-    "start": "npx webpack serve",
-    "wwwdist": "zip -j dist/igc-xc-score-web.zip dist/www/*",
-    "prepare": "npx rollup -c && npm run nexe && npm run www && npm run doc",
-    "c8": "npx c8 node --no-warnings test/test.js",
-    "lcov": "npx c8 report --reporter=text-lcov > coverage/tests.lcov",
-    "codecov": "curl -s https://codecov.io/bash | bash",
-    "preversion": "npm test",
-    "version": "npm run prepare && git add package.json",
-    "postversion": "git push && git push --tags && npm run upload",
-    "upload": "npm run wwwdist && gh release create -d -t $npm_package_version --notes '' v$npm_package_version dist/igc-xc-score*"
+    "prepare": "npx rollup -c"
   },
   "repository": {
     "type": "git",
@@ -45,7 +22,10 @@
     "igc",
     "paragliding",
     "hang-gliding",
-    "gliding"
+    "gliding",
+    "react-native",
+    "mobile",
+    "cross-country"
   ],
   "author": "Momtchil Momtchev <momtchil@momtchev.com>",
   "license": "LGPL-3.0-or-later",
@@ -56,37 +36,21 @@
   "dependencies": {
     "collections": "^5.1.13",
     "flatbush": "^4.2.0",
-    "igc-parser": "^2.0.0",
     "rbush": "^4.0.0"
   },
   "devDependencies": {
-    "@popperjs/core": "^2.11.6",
     "@rollup/plugin-commonjs": "^28.0.0",
     "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "^16.0.0",
     "@rollup/plugin-terser": "^0.4.4",
-    "bootstrap": "^5.3.3",
     "builtin-modules": "^4.0.0",
-    "c8": "^10.1.2",
-    "copy-webpack-plugin": "^12.0.2",
-    "css-loader": "^7.1.2",
-    "elliptic": ">=6.5.4",
     "eslint": "^8.56.0",
     "eslint-config-standard": "^17.1.0",
     "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^6.1.1",
-    "jquery": "^3.7.1",
     "jsdoc": "^4.0.2",
-    "nexe": "^4.0.0-rc.6",
-    "ol": "^10.2.0",
-    "ol-layerswitcher": "^4.1.1",
-    "rollup": "^4.22.4",
-    "rollup-plugin-executable": "^1.6.3",
-    "style-loader": "^4.0.0",
-    "webpack": "^5.94.0",
-    "webpack-cli": "^6.0.1",
-    "webpack-dev-server": "^5.1.0"
+    "rollup": "^4.22.4"
   },
   "engines": {
     "node": ">=18"

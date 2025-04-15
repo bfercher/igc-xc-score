@@ -1,12 +1,10 @@
-# igc-xc-score
+# igc-xc-score for React Native
 
 [![License: LGPL v3](https://img.shields.io/badge/License-LGPL%20v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
-[![Node.js CI](https://github.com/mmomtchev/igc-xc-score/workflows/Node.js%20CI/badge.svg)](https://github.com/mmomtchev/igc-xc-score/actions?query=workflow%3A%22Node.js+CI%22)
-[![codecov](https://codecov.io/gh/mmomtchev/igc-xc-score/branch/master/graph/badge.svg)](https://codecov.io/gh/mmomtchev/igc-xc-score)
 
-igc-xc-score is a paragliding and hang-gliding XC scoring tool in vanilla JS.
+A lean React Native compatible paragliding and hang-gliding XC scoring library in vanilla JS, with no web dependencies and no IGC parser dependency.
 
-It can be used directly from the command-line, or as a library embedded in a web browser or an application.
+This library provides a solver to calculate optimal flight paths and scores according to various competition rules, with a focus on being lightweight and compatible with React Native environments.
 
 Currently FFVL, XContest, FAI and XCLeague scoring rules are implemented, but you can pass your own structure with scoring info.
 
@@ -14,7 +12,14 @@ Changing the multipliers or the closing distances is easy, adding new bounding a
 
 See *scoring-rules.config.js* if you want to modify the rules.
 
-**You have an IGC file for which you think that there is a higher scoring solution using only track-log points? Send it along with your turnpoints and I will investigate.**
+## Features
+
+- ✅ React Native compatible
+- ✅ No web dependencies
+- ✅ No IGC parser dependency
+- ✅ Optimized for mobile use
+- ✅ Multiple scoring rule implementations
+- ✅ High-precision geographical calculations
 
 ## Background
 
@@ -86,163 +91,70 @@ The tool includes a launch and landing detection based upon a moving average of 
 
 ## Installation
 
-If you just want to run it from the command-line, download the executable file for your platform from the [releases section](https://github.com/mmomtchev/igc-xc-score/releases).
-
-Or, if you already have Node.js, you can download the source distribution with npm:
 ```bash
+# Using npm
 npm install igc-xc-score
+
+# Using yarn
+yarn add igc-xc-score
 ```
 
-You can try a demo here: [https://www.meteo.guru/xc-score/](https://www.meteo.guru/xc-score/).
+### Usage in React Native
 
-The sources used for this demo are in the www directory.
+This library was specifically modified to work in React Native environments without any web dependencies or IGC parser dependencies.
 
-### Installing the webpage on your own webserver
+```javascript
+// Import the solver in your React Native app
+import { solver, scoringRules } from 'igc-xc-score';
 
-If you do not need to customize it, you can simply download `igc-xc-score-web.zip` from the [releases section](https://github.com/mmomtchev/igc-xc-score/releases) and unzip it in a directory on your webserver. If you want to integrate the software on your website, read the section *The solver library* below.
+// Provide your own flight data - you need to parse IGC files yourself
+// The solver expects a flight object with the following structure:
+const flight = {
+  fixes: [
+    // Array of GPS fixes
+    { 
+      timestamp: 1546866868000,  // Timestamp in milliseconds
+      latitude: 47.123,          // Latitude in decimal degrees
+      longitude: 8.456,          // Longitude in decimal degrees
+      valid: true,               // Whether the fix is valid
+      pressureAltitude: 1200,    // Pressure altitude in meters
+      gpsAltitude: 1220          // GPS altitude in meters
+    },
+    // More fixes...
+  ]
+};
 
-### Installing the webpage on your computer for offline use (**user**)
-
-Download `igc-xc-score-web.zip` from the [releases section](https://github.com/mmomtchev/igc-xc-score/releases) and unzip it in a directory on your computer, then open a browser window and navigate to `file:///` to wherever you unzipped the folder.
-
-### Run the web demo with the built-in webserver (**developer**)
-
-There is an `npm start` script. Run in the package root directory:
-```bash
-npm start
-```
-Then use your browser to connect to http://localhost:9000
-
-## Usage
-
-### The prepackaged command-line tool
-
-Using with an executable (**user**)
-```bash
-igc-xc-score flight.igc out=flight.json maxtime=50 scoring=FFVL
-igc-xc-score flight.igc out=flight.json maxtime=50 scoring=XContest
-```
-
-You can visualize the resulting GeoJSON files at [geojson.io](http://geojson.io/).
-
-It will contain all the details of the optimal solution - score, distances, turnpoints. See the section below on program output for additional details.
-
-Valid options are:
-```bash
-out=<geojson>           # save the optimal solution in <geojson>
-maxtime=<seconds>       # do not run for more than <seconds>, producing eventually a sub-optimal result
-quiet=false             # do not output any unncessary information
-pipe=false              # run in pipe mode, reading flight data from stdin and writing optimal solutions to stdout, works best with quiet, use stdin for filename
-progress=<milliseconds> # report the current solution every <milliseconds>, works best in pipe mode
-noflight=false          # do not include the flight track in the geojson output
-invalid=false           # include invalid GPS fixes
-hp=false                # High Precision mode, use Vincenty's instead of FCC distances, twice slower for a little bit better precision
-trim=false              # auto-trim the flight log to its launch and landing points
-```
-
-Using with node (**developer**)
-```bash
-# when checking out from github (already included in the npm package)
-npm run build
-
-# bundled and minified version
-node dist/igc-xc-score.cjs flight.igc out=flight.json quiet=true
-cat flight.json | jq .properties
-
-# source version for debugging
-node src/cli
-```
-
-### The solver library
-
-Calling the solver from another Node.js program is easy, you should look at `src/cli.js` (the CLI tool) and `src/test.js` (the unit tests) for examples.
-
-#### CJS
-```JS
-const fs = require('fs');
-const IGCParser = require('igc-parser');
-const { scoringRules, solver } = require('igc-xc-score');
-const flight = IGCParser.parse(fs.readFileSync(path.join('test', test.file), 'utf8'), { lenient: true });
-const result = solver(flight, scoringRules.FFVL).next().value;
-if (result.optimal)
-    console.log(`score is ${result.score}`)
-```
-
-#### ESM
-```JS
-import IGCParser from 'igc-parser';
-import { solver, scoringRules as scoring } from 'igc-xc-score';
-const flight = IGCParser.parse(fs.readFileSync(path.join('test', test.file), 'utf8'), { lenient: true });
-const result = solver(flight, scoring.FFVL).next().value;
-if (result.optimal)
-    console.log(`score is ${result.score}`)
+// Run the solver with desired scoring rules
+try {
+  // Get the optimal solution - note that solver is a generator function
+  const best = solver(flight, scoringRules.FFVL, { 
+    trim: true,       // Auto-trim the flight to launch/landing
+    maxcycle: 5000    // Limit computation time per cycle (good for mobile)
+  }).next().value;
+  
+  // Access the result
+  console.log(`Score: ${best.score} points`);
+  console.log(`Distance: ${best.scoreInfo.distance} km`);
+  
+  // The result also contains a GeoJSON with all turnpoints and flight path
+  const geoJson = best.geojson();
+} catch (error) {
+  console.error('Error calculating flight score:', error);
+}
 ```
 
 *solver* is a generator function that can be called multiple times with a maximum execution time. Each successive call will return a better solution if such a solution has been found until an optimal solution is reached.
-I strongly recommend you to use the *lenient=true* option of igc-parser as a large portion of the IGC files in the paragliding world are coming from devices that do not fully adhere to the IGC standard - especially the smartphone apps some pilots use.
-*Be advised that in JS, a for..of loop will ignore the final return value of a generator. Do not use a for..of loop. Look at index.js for a proper solution.*
 
 *solver* accepts the following options in its third argument:
 ```JS
 const default_opt = {
-    maxcycle: undefined          // max execution time per cycle in milliseconds
-    noflight: false              // do not include the flight track in the geojson output
+    maxcycle: undefined          // max execution time per cycle in milliseconds (recommended for mobile)
+    noflight: false              // do not include the flight track in the geojson output (reduces memory usage)
     invalid: false               // do not filter invalid GPS fixes
     hp: false                    // High Precision mode, use Vincenty's instead of FCC distances, twice slower for a little bit better precision
     trim: false                  // auto-trim the flight to its launch and landing points
 };
 ```
-
-When calling from the browser, in order to avoid blocking the main event loop, you should use *requestIdleCallback* when it is available. When it is not, *setTimeout* could be a good substitute. It is best to fire the optimizer in small bursts of 50ms to 200ms each in order to keep the browser responsive. The human perception of simultaneity is limited to about 100ms, so this is a good starting point.
-```JS
-function loop() {
-    const s = this.next();
-    if (!s.done) {
-        $('#spinner').show();
-        window.requestIdleCallback(loop.bind(this));
-        $('#status').html(`trying solutions, best so far is ${s.value.score} points`);
-    } else {
-        $('#spinner').hide();
-        $('#status').html(`Best possible ${s.value.score} points`);
-    }
-}
-
-window.requestIdleCallback(() => {
-    const it = igcSolver(igcFlight, igcScoring.FFVL, { maxcycle: 100 });
-    loop.call(it);
-})
-```
-
-### Integrating with a non-JS desktop application
-
-Probably the easiest way to embed the solver in a non-JS desktop application is to use the provided executable in pipe (stdin/stdout) mode. It expects an IGC file as its and input and it will output the possible solutions in GeoJSON format. See the section below on flight instruments if the file size is a problem.
-
-Or, you can also check my project [libnode](https://github.com/libnode) for a direct solution for embedding Node.js code in a C/C++ application.
-
-### Using this module in memory/CPU-constrained embedded environments (ie flight instruments)
-
-Depending on the exact nature of your device, you might be able to use the full version. Android-based devices should be more than capable of running the original JS code.
-
-#### If the problem is the executable file size
-
-Using the JS code in an older embedded engine (Rhino and Chakra for example) will lead to abysmal performance. However a very simple solution is to use Babel 6 to transpile to ES2015 and to embed Node4:
-```bash
-npm i nexe babel-cli babel-plugin-transform-runtime babel-polyfill babel-preset-env babel-preset-es2015 babel-preset-stage-0
-echo '{"presets":["es2015","stage-0"],"plugins":[["transform-runtime",{"regenerator":true}]]}' > .babelrc
-babel igc-xc-score.js --minified -o igc-xc-score.es2015.js
-cat igc-xc-score.es2015.js | nexe -o igc-xc-score-node4-linux -t linux-x64-4.9.1
-cat igc-xc-score.es2015.js | nexe -o igc-xc-score-node4-macos -t mac-x64-4.9.1
-cat igc-xc-score.es2015.js | nexe -o igc-xc-score-node4-win.exe -t windows-x64-4.8.4
-```
-This will lower the executable size down to about 10Mb on Windows and 15Mb on Linux with almost no loss of performance at all. Further reduction is possible if you build yourself a Node 0.14 package.
-
-#### If CPU/memory is the problem
-
-I have lots of experience working on ARM and MIPS platforms, so you can contact me for porting the library to your specific device, but this definitely won't be free or open-source software. Debugging a very complex mathematical algorithm in C++ on a small electronic board with an integrated hardware debugger is not a leisure project. Porting this software to an integrated low-level ARM/MIPS board is a 1-month project.
-
-#### Implementing continuous dynamic search
-
-Modifying the algorithm to allow it to continuously search in-flight for nearby points that maximize the score is also possible and it is a 2-weeks project.
 
 ## Program Output
 
@@ -274,8 +186,6 @@ Every tp/cp element also contains an **r** and a **timestamp** field. These are 
 Adding new types of flights requires some basic working knowledge of linear optimization and at least some understanding of the branch and bound algorithm. 
 
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
-
-Please make sure to update tests as appropriate.
 
 ## License
 [LGPL](https://choosealicense.com/licenses/lgpl-3.0/)

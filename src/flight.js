@@ -118,6 +118,22 @@ function detectLaunchLanding(fixes) {
     return ll;
 }
 
+/**
+ * Analyze a flight to detect launch and landing
+ * @param {Object} flight - The flight object
+ * @param {Array} flight.fixes - Array of GPS fixes with the following properties:
+ *   - timestamp {number} - Timestamp in milliseconds
+ *   - latitude {number} - Latitude in decimal degrees
+ *   - longitude {number} - Longitude in decimal degrees 
+ *   - valid {boolean} - Whether the GPS fix is valid
+ *   - pressureAltitude {number} - Pressure altitude in meters
+ *   - gpsAltitude {number} - GPS altitude in meters
+ * @param {Object} config - Configuration options
+ * @param {boolean} [config.invalid=false] - Whether to include invalid GPS fixes
+ * @param {boolean} [config.trim=false] - Whether to auto-trim the flight
+ * @param {boolean} [config.detectLaunch=false] - Whether to detect launch
+ * @param {boolean} [config.detectLanding=false] - Whether to detect landing
+ */
 export function analyze(flight, config) {
     if (!config.invalid)
         flight.filtered = flight.fixes.filter(x => x.valid)

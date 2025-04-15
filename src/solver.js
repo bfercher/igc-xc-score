@@ -15,7 +15,14 @@ import scoringRules from '../scoring-rules.config.js';
 
 /**
  * This the solver
- * @param {IGCFile} flight flight track data in the igc_parser format
+ * @param {Object} flight - The flight object with GPS data
+ * @param {Array} flight.fixes - Array of GPS fixes with the following properties:
+ *   - timestamp {number} - Timestamp in milliseconds
+ *   - latitude {number} - Latitude in decimal degrees
+ *   - longitude {number} - Longitude in decimal degrees 
+ *   - valid {boolean} - Whether the GPS fix is valid
+ *   - pressureAltitude {number} - Pressure altitude in meters
+ *   - gpsAltitude {number} - GPS altitude in meters
  * @param {object[]} [scoringTypes=undefined] undefined for FFVL or one of the elements of scoringRules
  * @param {object=} config optional config parameters
  * @param {number=} config.maxcycle maximum execution time of the solver in ms, each sucessive call will return a better solution, default undefined for unlimited
